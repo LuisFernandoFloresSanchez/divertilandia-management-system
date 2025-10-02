@@ -1049,7 +1049,11 @@ class ProductionDataSeeder extends Seeder
 );
 
         if (!empty($relations)) {
-            DB::table('game_toy_clause')->insert($relations);
+            // Convertir objetos a arrays para la inserción
+            $relationsArray = array_map(function($relation) {
+                return (array) $relation;
+            }, $relations);
+            DB::table('game_toy_clause')->insert($relationsArray);
         }
     }
 
