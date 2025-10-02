@@ -16,11 +16,16 @@ class DatabaseSeeder extends Seeder
     {
         $this->command->info('🚀 Iniciando seeding de la base de datos...');
         
-        // Crear usuario de prueba (opcional - puedes comentar si no lo necesitas)
-        User::factory()->create([
-            'name' => 'Admin Divertilandia',
-            'email' => 'admin@divertilandia.com',
-        ]);
+        // Crear usuario de prueba solo si no existe
+        if (!User::where('email', 'admin@divertilandia.com')->exists()) {
+            User::factory()->create([
+                'name' => 'Admin Divertilandia',
+                'email' => 'admin@divertilandia.com',
+            ]);
+            $this->command->info('👤 Usuario admin creado exitosamente.');
+        } else {
+            $this->command->info('👤 Usuario admin ya existe, omitiendo creación.');
+        }
 
         // Ejecutar el seeder con todos los datos reales de producción
         $this->call(ProductionDataSeeder::class);
