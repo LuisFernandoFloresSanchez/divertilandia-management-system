@@ -10,20 +10,21 @@ class DatabaseSeeder extends Seeder
 {
     /**
      * Seed the application's database.
+     * Ahora usa únicamente el ProductionDataSeeder que contiene todos los datos reales.
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
+        $this->command->info('🚀 Iniciando seeding de la base de datos...');
+        
+        // Crear usuario de prueba (opcional - puedes comentar si no lo necesitas)
         User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+            'name' => 'Admin Divertilandia',
+            'email' => 'admin@divertilandia.com',
         ]);
 
-        // Ejecutar el seeder de configuraciones de eventos
-        $this->call(EventSettingsSeeder::class);
+        // Ejecutar el seeder con todos los datos reales de producción
+        $this->call(ProductionDataSeeder::class);
         
-        // Ejecutar el seeder de tipos de juguetes
-        $this->call(ToyTypesSeeder::class);
+        $this->command->info('✅ Base de datos poblada exitosamente con datos de producción!');
     }
 }

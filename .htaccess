@@ -1,0 +1,17 @@
+# Habilitar el motor de reescritura
+RewriteEngine On
+
+# Importante: redirigir todas las solicitudes API a Laravel
+RewriteCond %{REQUEST_URI} ^/api
+RewriteRule ^api/(.*)$ divertilandia-backend/public/index.php/api/$1 [L,QSA]
+
+# Servir archivos estáticos
+RewriteCond %{REQUEST_FILENAME} -f
+RewriteRule ^ - [L]
+
+# Servir directorios
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# Todo lo demás va al frontend
+RewriteRule ^ index.html [L]
