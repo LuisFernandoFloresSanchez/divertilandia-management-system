@@ -46,19 +46,30 @@ class ExpenseController extends Controller
      */
     public function store(Request $request): JsonResponse
     {
-        $request->validate([
+        $validated = $request->validate([
             'concept' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'amount' => 'required|numeric|min:0',
+            'amount' => 'required|numeric|min:0.01',
             'receipt_image' => 'nullable|string',
             'expense_category_id' => 'required|exists:expense_categories,id',
             'event_id' => 'nullable|exists:events,id',
-            'status' => 'in:pending,paid',
+            'status' => 'required|in:pending,paid',
             'expense_date' => 'required|date',
             'payment_date' => 'nullable|date|after_or_equal:expense_date'
+        ], [
+            'concept.required' => 'El concepto es requerido',
+            'amount.required' => 'El monto es requerido',
+            'amount.min' => 'El monto debe ser mayor a 0',
+            'expense_category_id.required' => 'La categoría es requerida',
+            'expense_category_id.exists' => 'La categoría seleccionada no existe',
+            'status.required' => 'El estado es requerido',
+            'status.in' => 'El estado debe ser "pending" o "paid"',
+            'expense_date.required' => 'La fecha del gasto es requerida',
+            'expense_date.date' => 'La fecha del gasto no es válida',
+            'payment_date.after_or_equal' => 'La fecha de pago debe ser igual o posterior a la fecha del gasto'
         ]);
 
-        $expense = Expense::create($request->all());
+        $expense = Expense::create($validated);
         $expense->load(['category', 'event']);
 
         return response()->json($expense, 201);
@@ -80,19 +91,28 @@ class ExpenseController extends Controller
     {
         $expense = Expense::findOrFail($id);
 
-        $request->validate([
+        $validated = $request->validate([
             'concept' => 'sometimes|string|max:255',
             'description' => 'nullable|string',
-            'amount' => 'sometimes|numeric|min:0',
+            'amount' => 'sometimes|numeric|min:0.01',
             'receipt_image' => 'nullable|string',
             'expense_category_id' => 'sometimes|exists:expense_categories,id',
             'event_id' => 'nullable|exists:events,id',
             'status' => 'sometimes|in:pending,paid',
             'expense_date' => 'sometimes|date',
             'payment_date' => 'nullable|date|after_or_equal:expense_date'
+        ], [
+            'concept.string' => 'El concepto debe ser texto',
+            'concept.max' => 'El concepto no puede tener más de 255 caracteres',
+            'amount.numeric' => 'El monto debe ser numérico',
+            'amount.min' => 'El monto debe ser mayor a 0',
+            'expense_category_id.exists' => 'La categoría seleccionada no existe',
+            'status.in' => 'El estado debe ser "pending" o "paid"',
+            'expense_date.date' => 'La fecha del gasto no es válida',
+            'payment_date.after_or_equal' => 'La fecha de pago debe ser igual o posterior a la fecha del gasto'
         ]);
 
-        $expense->update($request->all());
+        $expense->update($validated);
         $expense->load(['category', 'event']);
 
         return response()->json($expense);

@@ -907,7 +907,10 @@ class ProductionDataSeeder extends Seeder
 );
 
         foreach ($games as $game) {
-            Game::create($game);
+            Game::updateOrCreate(
+                ['id' => $game['id']], // Buscar por ID
+                $game // Datos a actualizar o crear
+            );
         }
     }
 
@@ -1974,7 +1977,11 @@ class ProductionDataSeeder extends Seeder
 );
 
         if (!empty($relations)) {
-            DB::table('package_games')->insert($relations);
+            // Convertir objetos a arrays para la inserción
+            $relationsArray = array_map(function($relation) {
+                return (array) $relation;
+            }, $relations);
+            DB::table('package_games')->insert($relationsArray);
         }
     }
 
@@ -3313,7 +3320,7 @@ class ProductionDataSeeder extends Seeder
     'model' => 'MG',
     'year' => '2024',
     'plate_number' => NULL,
-    'fuel_type' => 'premium',
+    'fuel_type' => 'regular',
     'fuel_efficiency' => '11.00',
     'color' => '#000000',
     'is_active' => true,
@@ -3327,7 +3334,7 @@ class ProductionDataSeeder extends Seeder
     'model' => 'Nissan',
     'year' => '2025',
     'plate_number' => NULL,
-    'fuel_type' => 'regular',
+    'fuel_type' => 'premium',
     'fuel_efficiency' => '12.00',
     'color' => '#fffaf8',
     'is_active' => true,
@@ -3341,7 +3348,7 @@ class ProductionDataSeeder extends Seeder
     'model' => 'Nissan',
     'year' => '2021',
     'plate_number' => NULL,
-    'fuel_type' => 'regular',
+    'fuel_type' => 'premium',
     'fuel_efficiency' => '12.00',
     'color' => '#eb7a00',
     'is_active' => true,
