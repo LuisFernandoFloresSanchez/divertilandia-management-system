@@ -17,6 +17,11 @@ class EventController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
+        // Modo ligero para calendario - sin imágenes
+        if ($request->has('calendar_mode') && $request->calendar_mode == 'true') {
+            return $this->getCalendarEvents($request);
+        }
+
         $query = Event::with('package');
 
         // Filtrar por fecha si se proporciona
@@ -37,6 +42,80 @@ class EventController extends Controller
         $events = $query->orderBy('event_date')->orderBy('start_time')->get();
 
         return response()->json($events);
+    }
+
+    /**
+     * Obtener eventos optimizados para el calendario (sin imágenes pesadas)
+     */
+    private function getCalendarEvents(Request $request): JsonResponse
+    {
+        $query = Event::with(['package' => function ($query) {
+            // Solo cargar datos básicos del paquete, sin juegos ni imágenes
+            $query->select('id', 'name', 'price', 'max_age', 'is_active');
+        }]);
+
+        // Filtrar por fecha si se proporciona
+        if ($request->has('date')) {
+            $query->whereDate('event_date', $request->date);
+        }
+
+        // Filtrar por rango de fechas
+        if ($request->has('start_date') && $request->has('end_date')) {
+            $query->whereBetween('event_date', [$request->start_date, $request->end_date]);
+        }
+
+        // Filtrar por estado
+        if ($request->has('status')) {
+            $query->where('status', $request->status);
+        }
+
+        $events = $query->orderBy('event_date')->orderBy('start_time')->get();
+
+        // Mapear eventos para quitar campos pesados innecesarios
+        $lightEvents = $events->map(function ($event) {
+            return [
+                'id' => $event->id,
+                'contact_name' => $event->contact_name,
+                'contact_phone' => $event->contact_phone,
+                'secondary_phone' => $event->secondary_phone,
+                'address' => $event->address,
+                'google_maps_url' => $event->google_maps_url,
+                'event_date' => $event->event_date,
+                'start_time' => $event->start_time,
+                'end_time' => $event->end_time,
+                'extra_hours' => $event->extra_hours,
+                'package_id' => $event->package_id,
+                'package' => $event->package ? [
+                    'id' => $event->package->id,
+                    'name' => $event->package->name,
+                    'price' => $event->package->price,
+                ] : null,
+                'discount_percentage' => $event->discount_percentage,
+                'package_discount_amount' => $event->package_discount_amount,
+                'advance_payment' => $event->advance_payment,
+                'status' => $event->status,
+                'child_gender' => $event->child_gender,
+                'notes' => $event->notes,
+                'has_advance_payment' => $event->has_advance_payment,
+                'advance_payment_amount' => $event->advance_payment_amount,
+                'extra_hours_count' => $event->extra_hours_count,
+                'extra_tables' => $event->extra_tables,
+                'extra_chairs' => $event->extra_chairs,
+                'extra_playpens' => $event->extra_playpens,
+                'extra_toys' => $event->extra_toys,
+                'extra_services' => $event->extra_services,
+                'extra_services_cost' => $event->extra_services_cost,
+                'tables_cost' => $event->tables_cost,
+                'chairs_cost' => $event->chairs_cost,
+                'playpens_cost' => $event->playpens_cost,
+                'toys_cost' => $event->toys_cost,
+                'total_extras_cost' => $event->total_extras_cost,
+                'created_at' => $event->created_at,
+                'updated_at' => $event->updated_at,
+            ];
+        });
+
+        return response()->json($lightEvents);
     }
 
     /**

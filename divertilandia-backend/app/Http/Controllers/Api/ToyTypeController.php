@@ -31,16 +31,19 @@ class ToyTypeController extends Controller
      */
     public function store(Request $request): JsonResponse
     {
-        $request->validate([
+        $validated = $request->validate([
             'name' => 'required|string|max:255|unique:toy_types,name',
-            'description' => 'required|string',
+            'description' => 'nullable|string',
             'is_active' => 'boolean'
+        ], [
+            'name.required' => 'El nombre es requerido',
+            'name.unique' => 'Este nombre ya está en uso',
         ]);
 
         $toyType = ToyType::create([
-            'name' => $request->name,
-            'description' => $request->description,
-            'is_active' => $request->get('is_active', true)
+            'name' => $validated['name'],
+            'description' => $validated['description'] ?? '',
+            'is_active' => $validated['is_active'] ?? true
         ]);
 
         return response()->json($toyType, 201);
@@ -62,13 +65,15 @@ class ToyTypeController extends Controller
     {
         $toyType = ToyType::findOrFail($id);
 
-        $request->validate([
+        $validated = $request->validate([
             'name' => 'sometimes|string|max:255|unique:toy_types,name,' . $id,
-            'description' => 'sometimes|string',
+            'description' => 'nullable|string',
             'is_active' => 'sometimes|boolean'
+        ], [
+            'name.unique' => 'Este nombre ya está en uso',
         ]);
 
-        $toyType->update($request->only(['name', 'description', 'is_active']));
+        $toyType->update($validated);
 
         return response()->json($toyType);
     }
