@@ -48,7 +48,7 @@ class Event extends Model
 
     protected $casts = [
         'event_date' => 'date',
-        'start_time' => 'datetime:H:i',
+        // No castear start_time y end_time como datetime - dejarlos como string HH:MM
         'extra_hours' => 'integer',
         'extra_hours_count' => 'integer',
         'extra_tables' => 'integer',
