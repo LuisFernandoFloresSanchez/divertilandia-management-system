@@ -17,11 +17,20 @@ class EventController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
+        // Log para debugging
+        \Log::info('EventController@index - Parámetros recibidos:', [
+            'calendar_mode' => $request->get('calendar_mode'),
+            'has_calendar_mode' => $request->has('calendar_mode'),
+            'all_params' => $request->all()
+        ]);
+
         // Modo ligero para calendario - sin imágenes
         if ($request->has('calendar_mode') && $request->calendar_mode == 'true') {
+            \Log::info('Usando modo calendario optimizado');
             return $this->getCalendarEvents($request);
         }
 
+        \Log::warning('Usando modo completo (con imágenes) - NO RECOMENDADO');
         $query = Event::with('package');
 
         // Filtrar por fecha si se proporciona
@@ -71,6 +80,11 @@ class EventController extends Controller
 
         $events = $query->orderBy('event_date')->orderBy('start_time')->get();
 
+        \Log::info('getCalendarEvents - Eventos obtenidos:', [
+            'total_events' => $events->count(),
+            'event_ids' => $events->pluck('id')->toArray()
+        ]);
+
         // Mapear eventos para quitar campos pesados innecesarios
         $lightEvents = $events->map(function ($event) {
             return [
@@ -114,6 +128,11 @@ class EventController extends Controller
                 'updated_at' => $event->updated_at ? $event->updated_at->toISOString() : null,
             ];
         });
+
+        \Log::info('getCalendarEvents - Eventos devueltos:', [
+            'total_returned' => $lightEvents->count(),
+            'returned_ids' => $lightEvents->pluck('id')->toArray()
+        ]);
 
         return response()->json($lightEvents);
     }
