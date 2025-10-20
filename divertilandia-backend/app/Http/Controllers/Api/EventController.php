@@ -95,8 +95,8 @@ class EventController extends Controller
                 'address' => $event->address,
                 'google_maps_url' => $event->google_maps_url,
                 'event_date' => $event->event_date ? $event->event_date->format('Y-m-d') : null,
-                'start_time' => $event->start_time,
-                'end_time' => $event->end_time,
+                'start_time' => $event->start_time ? substr($event->start_time, 0, 5) : null, // Solo HH:MM
+                'end_time' => $event->end_time ? substr($event->end_time, 0, 5) : null, // Solo HH:MM
                 'extra_hours' => $event->extra_hours,
                 'package_id' => $event->package_id,
                 'package' => $event->package ? [
