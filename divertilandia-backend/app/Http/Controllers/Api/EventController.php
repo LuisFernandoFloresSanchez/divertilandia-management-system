@@ -80,7 +80,7 @@ class EventController extends Controller
                 'secondary_phone' => $event->secondary_phone,
                 'address' => $event->address,
                 'google_maps_url' => $event->google_maps_url,
-                'event_date' => $event->event_date,
+                'event_date' => $event->event_date ? $event->event_date->format('Y-m-d') : null,
                 'start_time' => $event->start_time,
                 'end_time' => $event->end_time,
                 'extra_hours' => $event->extra_hours,
@@ -110,8 +110,8 @@ class EventController extends Controller
                 'playpens_cost' => $event->playpens_cost,
                 'toys_cost' => $event->toys_cost,
                 'total_extras_cost' => $event->total_extras_cost,
-                'created_at' => $event->created_at,
-                'updated_at' => $event->updated_at,
+                'created_at' => $event->created_at ? $event->created_at->toISOString() : null,
+                'updated_at' => $event->updated_at ? $event->updated_at->toISOString() : null,
             ];
         });
 
