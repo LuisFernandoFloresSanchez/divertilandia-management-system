@@ -38,7 +38,12 @@ class VehicleController extends Controller
             'year' => 'nullable|string|max:4',
             'plate_number' => 'nullable|string|max:20',
             'fuel_type' => 'required|in:regular,premium,diesel',
+            'vehicle_type' => 'sometimes|in:regular,hybrid',
             'fuel_efficiency' => 'required|numeric|min:0',
+            'battery_capacity_kwh' => 'nullable|numeric|min:0|required_if:vehicle_type,hybrid',
+            'electric_range_km' => 'nullable|numeric|min:0|required_if:vehicle_type,hybrid',
+            'battery_min_percentage' => 'nullable|numeric|min:0|max:100',
+            'hybrid_efficiency_km_per_liter' => 'nullable|numeric|min:0|required_if:vehicle_type,hybrid',
             'color' => 'nullable|string|max:7',
             'is_active' => 'boolean'
         ]);
@@ -70,7 +75,12 @@ class VehicleController extends Controller
             'year' => 'nullable|string|max:4',
             'plate_number' => 'nullable|string|max:20',
             'fuel_type' => 'sometimes|in:regular,premium,diesel',
+            'vehicle_type' => 'sometimes|in:regular,hybrid',
             'fuel_efficiency' => 'sometimes|numeric|min:0',
+            'battery_capacity_kwh' => 'nullable|numeric|min:0|required_if:vehicle_type,hybrid',
+            'electric_range_km' => 'nullable|numeric|min:0|required_if:vehicle_type,hybrid',
+            'battery_min_percentage' => 'nullable|numeric|min:0|max:100',
+            'hybrid_efficiency_km_per_liter' => 'nullable|numeric|min:0|required_if:vehicle_type,hybrid',
             'color' => 'nullable|string|max:7',
             'is_active' => 'sometimes|boolean'
         ]);

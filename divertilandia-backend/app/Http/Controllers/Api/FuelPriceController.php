@@ -40,7 +40,7 @@ class FuelPriceController extends Controller
     {
         try {
             $validator = Validator::make($request->all(), [
-                'fuel_type' => 'required|in:regular,premium',
+                'fuel_type' => 'required|in:regular,premium,diesel,electricity',
                 'price_per_liter' => 'required|numeric|min:0',
                 'effective_date' => 'required|date',
                 'notes' => 'nullable|string|max:500'
@@ -106,7 +106,7 @@ class FuelPriceController extends Controller
             $fuelPrice = FuelPrice::findOrFail($id);
 
             $validator = Validator::make($request->all(), [
-                'fuel_type' => 'sometimes|required|in:regular,premium',
+                'fuel_type' => 'sometimes|required|in:regular,premium,diesel,electricity',
                 'price_per_liter' => 'sometimes|required|numeric|min:0',
                 'effective_date' => 'sometimes|required|date',
                 'is_active' => 'sometimes|boolean',

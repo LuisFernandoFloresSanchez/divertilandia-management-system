@@ -79,7 +79,13 @@ class FuelPrice extends Model
      */
     public function getFuelTypeFormattedAttribute()
     {
-        return $this->fuel_type === 'regular' ? 'Gasolina Roja' : 'Gasolina Verde';
+        $types = [
+            'regular' => 'Gasolina Roja',
+            'premium' => 'Gasolina Verde',
+            'diesel' => 'Diésel',
+            'electricity' => 'Electricidad (kWh)'
+        ];
+        return $types[$this->fuel_type] ?? $this->fuel_type;
     }
 
     /**
